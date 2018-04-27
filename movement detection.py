@@ -21,6 +21,11 @@ now_time = now.time()
 time_between_resets = 0.3 #mins
 time_between_updates = 0.01 #secs
 
+camera = PiCamera()
+camera.resolution = (640, 480)
+camera.framerate = 32
+rawCapture = PiRGBArray(camera, size=(640, 480))
+
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-v", "--video", help="path to the video file")
@@ -93,7 +98,8 @@ def sendinfo(long):
 
 
 # loop over the frames of the video
-while True:
+for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #while True:
+
     if now_time >= time(8,00) and now_time <= time(18,00):
         # grab the current frame and initialize the occupied/unoccupied
         # text
@@ -103,14 +109,15 @@ while True:
         # if the frame could not be grabbed, then we have reached the end
         # of the video
         try:
-            camera.capture(rawCapture, format="bgr")
-            frame = rawCapture.array
+            #camera.capture(rawCapture, format="bgr")
+            #image = rawCapture.array
+            image = frame.array
         except:
             print("broke")
             break
 
         # resize the frame, convert it to grayscale, and blur it
-        frame = imutils.resize(frame, width=500)
+        frame = imutils.resize(image, width=500)
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         gray = cv2.GaussianBlur(gray, (21, 21), 0)
 
@@ -180,8 +187,8 @@ while True:
 
         # show the frame and record if the user presses a key
         cv2.imshow("Security Feed", frame)
-        cv2.imshow("Thresh", thresh)
-        cv2.imshow("Frame Delta", frameDelta)
+        #cv2.imshow("Thresh", thresh)
+        #cv2.imshow("Frame Delta", frameDelta)
 
         key = cv2.waitKey(1) & 0xFF
 
@@ -206,11 +213,13 @@ while True:
         ti.sleep(30 *60)
         # if the video argument is None, then we are reading from webcam
         if args.get("video", None) is None:
-            camera = cv2.VideoCapture(0)
+            #camera = cv2.VideoCapture(0) #DONNNOOO HERE -----------------------------
             ti.sleep(0.25)
         # otherwise, we are reading from a video file
         else:
             camera = cv2.VideoCapture(args["video"])
+            ti.sleep(0.25)
+    rawCapture.truncate(0)
 # cleanup the camera and close any open windows
-camera.release()
+#camera.release()
 cv2.destroyAllWindows()
