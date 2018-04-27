@@ -97,7 +97,7 @@ def sendinfo(long):
 
 # loop over the frames of the video
 for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #while True:
-
+    print("-----")
     if now_time >= time(8,00) and now_time <= time(18,00):
         # grab the current frame and initialize the occupied/unoccupied
         # text
@@ -129,6 +129,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
         # if the first frame is None, initialize it
         if firstFrame is None:
             firstFrame = gray
+            rawCapture.truncate(0)
             continue
 
         # compute the absolute difference between the current frame and
@@ -140,12 +141,14 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
         # on thresholded image
         thresh = cv2.dilate(thresh, None, iterations=2)
         (cnts, _) = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[-2:]
+        print("-----")
 
 
         # loop over the contours
         for c in cnts:
             # if the contour is too small, ignore it
             if cv2.contourArea(c) < args["min_area"]:
+                rawCapture.truncate(0)
                 continue
 
             # compute the bounding box for the contour, draw it on the frame,
@@ -194,18 +197,18 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
         if key == ord("q"):
             break
 
-        if ti.daylight and not running:
-            # Run once during daylight
-            print('Running script')
-            process = subprocess.Popen("Myscript.py")
-            running = True
-        elif not ti.daylight and running:
-            # Wait until next day before executing again
-            print('Terminating script')
-            process.kill()
-            running = False
+        #if ti.daylight and not running:
+        #    # Run once during daylight
+        #    print('Running script')
+        #    process = subprocess.Popen("Myscript.py")
+        #    running = True
+        #elif not ti.daylight and running:
+        #    # Wait until next day before executing again
+        #    print('Terminating script')
+        #    process.kill()
+        #    running = False
             #time.sleep(0.5*60)  # Wait 10 mins
-        rawCapture.truncate(0)
+
     else:
         print("hey")
         #camera.release()
