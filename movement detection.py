@@ -99,6 +99,7 @@ while True:
         # if the frame could not be grabbed, then we have reached the end
         # of the video
         if not grabbed:
+            print("broke")
             break
 
         # resize the frame, convert it to grayscale, and blur it
