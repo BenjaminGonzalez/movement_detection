@@ -115,7 +115,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
             break
 
         # resize the frame, convert it to grayscale, and blur it
-        frame = imutils.resize(image, width=500)
+        frame = imutils.resize(image, width=640)
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         gray = cv2.GaussianBlur(gray, (21, 21), 0)
 
@@ -170,7 +170,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                 print("send to image to cloudinary ----------------------------------------------", ti.time() - update_time)
                 update_time = ti.time()
                 #camera.capture('/opt/person.png')
-                return_value, image = camera.read()
+                #return_value, image = camera.read()
                 #cv2.imwrite('/opt/person.png', image)
                 cv2.imwrite('person.png', image)
                 try:
@@ -205,9 +205,10 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
             process.kill()
             running = False
             #time.sleep(0.5*60)  # Wait 10 mins
+        rawCapture.truncate(0)
     else:
         print("hey")
-        camera.release()
+        #camera.release()
         ti.sleep(30 *60)
         # if the video argument is None, then we are reading from webcam
         if args.get("video", None) is None:
