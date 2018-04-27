@@ -17,9 +17,10 @@ from picamera import PiCamera
 now = datetime.now()
 now_time = now.time()
 
+ti.sleep(100)
 
-time_between_resets = 0.3 #mins
-time_between_updates = 0.01 #secs
+time_between_resets = 5 #mins
+time_between_updates = 40. #secs
 
 
 
@@ -97,7 +98,7 @@ def sendinfo(long):
 
 # loop over the frames of the video
 for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True): #while True:
-    print("-----")
+    #print("-----")
     if now_time >= time(8,00) and now_time <= time(18,00):
         # grab the current frame and initialize the occupied/unoccupied
         # text
@@ -141,8 +142,6 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
         # on thresholded image
         thresh = cv2.dilate(thresh, None, iterations=2)
         (cnts, _) = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[-2:]
-        print("-----")
-
 
         # loop over the contours
         for c in cnts:
@@ -187,7 +186,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
             print("There is a PERSON there")
 
         # show the frame and record if the user presses a key
-        cv2.imshow("Security Feed", frame)
+        #cv2.imshow("Security Feed", frame)
         #cv2.imshow("Thresh", thresh)
         #cv2.imshow("Frame Delta", frameDelta)
 
@@ -197,30 +196,13 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
         if key == ord("q"):
             break
 
-        #if ti.daylight and not running:
-        #    # Run once during daylight
-        #    print('Running script')
-        #    process = subprocess.Popen("Myscript.py")
-        #    running = True
-        #elif not ti.daylight and running:
-        #    # Wait until next day before executing again
-        #    print('Terminating script')
-        #    process.kill()
-        #    running = False
-            #time.sleep(0.5*60)  # Wait 10 mins
 
     else:
-        print("hey")
+        #print("hey")
         #camera.release()
         ti.sleep(30 *60)
         # if the video argument is None, then we are reading from webcam
-        if args.get("video", None) is None:
-            #camera = cv2.VideoCapture(0) #DONNNOOO HERE -----------------------------
-            ti.sleep(0.25)
         # otherwise, we are reading from a video file
-        else:
-            camera = cv2.VideoCapture(args["video"])
-            ti.sleep(0.25)
     rawCapture.truncate(0)
 # cleanup the camera and close any open windows
 #camera.release()
