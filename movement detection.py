@@ -21,10 +21,7 @@ now_time = now.time()
 time_between_resets = 0.3 #mins
 time_between_updates = 0.01 #secs
 
-camera = PiCamera()
-camera.resolution = (640, 480)
-camera.framerate = 32
-rawCapture = PiRGBArray(camera, size=(640, 480))
+
 
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
@@ -34,9 +31,10 @@ ap.add_argument("-a", "--min-area", type=int, default=500,
 args = vars(ap.parse_args())
 # if the video argument is None, then we are reading from webcam
 if args.get("video", None) is None:
-    camera = cv2.VideoCapture(0)
     camera = PiCamera()
-    rawCapture = PiRGBArray(camera)
+    camera.resolution = (640, 480)
+    camera.framerate = 32
+    rawCapture = PiRGBArray(camera, size=(640, 480))
     ti.sleep(0.25)
 
 # otherwise, we are reading from a video file
