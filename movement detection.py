@@ -11,6 +11,8 @@ from datetime import datetime, time
 import cloudinary.uploader
 import config
 import urllib3
+from picamera.array import PiRGBArray
+from picamera import PiCamera
 
 now = datetime.now()
 now_time = now.time()
@@ -28,6 +30,8 @@ args = vars(ap.parse_args())
 # if the video argument is None, then we are reading from webcam
 if args.get("video", None) is None:
     camera = cv2.VideoCapture(0)
+    camera = PiCamera()
+    rawCapture = PiRGBArray(camera)
     ti.sleep(0.25)
 
 # otherwise, we are reading from a video file
@@ -93,12 +97,15 @@ while True:
     if now_time >= time(8,00) and now_time <= time(18,00):
         # grab the current frame and initialize the occupied/unoccupied
         # text
-        (grabbed, frame) = camera.read()
+        #(grabbed, frame) = camera.read() ---------------------------------
         text = "Unoccupied"
 
         # if the frame could not be grabbed, then we have reached the end
         # of the video
-        if not grabbed:
+        try:
+            camera.capture(rawCapture, format="bgr")
+            frame = rawCapture.array
+        except:
             print("broke")
             break
 
