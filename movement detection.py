@@ -13,6 +13,9 @@ import config
 import urllib3
 from picamera.array import PiRGBArray
 from picamera import PiCamera
+import signal
+
+
 
 now = datetime.now()
 now_time = now.time()
@@ -54,6 +57,26 @@ categories = [{'name': 'person', 'id': 1}]#label_map_util.convert_label_map_to_c
 category_index = {1: {'name': 'person', 'id': 1}}
 
 debug_communication = 0
+
+
+class Timeout():
+    """Timeout class using ALARM signal."""
+
+    class Timeout(Exception):
+        pass
+
+    def __init__(self, sec):
+        self.sec = sec
+
+    def __enter__(self):
+        signal.signal(signal.SIGALRM, self.raise_timeout)
+        signal.alarm(self.sec)
+
+    def __exit__(self, *args):
+        signal.alarm(0)  # disable alarm
+
+    def raise_timeout(self, *args):
+        raise Timeout.Timeout()
 
 def send_to_hcp(http, url, headers, qltty):
     timestamp = int(ti.time())
@@ -176,8 +199,10 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                 #cv2.imwrite('/opt/person.png', image)
                 cv2.imwrite('person.png', image)
                 try:
+                    with Timeout(3):
+
                     #cloudinary.uploader.upload("/opt/person.png", width="640", height="480", public_id="boiiiii", api_key="156733677359362", api_secret="gUf5tbocYS8dZvA94bps3f_ALNE", cloud_name="projecteve", version="v1507590682")
-                    cloudinary.uploader.upload("person.png", width="640", height="480", public_id="boiiiii",
+                        cloudinary.uploader.upload("person.png", width="640", height="480", public_id="boiiiii",
                                                api_key="156733677359362", api_secret="gUf5tbocYS8dZvA94bps3f_ALNE",
                                                cloud_name="projecteve", version="v1507590682")
                 except Exception as e:
